@@ -1,2 +1,5 @@
-ActorAnswerIntent The answer is {ActorName}
-ActorAnswerIntent {ActorName}
+ActorAnswerIntent I'm {PlayerName} and the answer is {ActorName}
+ActorAnswerIntent I'm {PlayerName} {ActorName}
+ScoreIntent What's the score
+ScoreIntent Score please
+ScoreIntent Who's winning

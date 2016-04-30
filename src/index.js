@@ -121,6 +121,8 @@ function onIntent(intentRequest, session, callback) {
     // dispatch custom intents to handlers here
     if ("ActorAnswerIntent" === intentName) {
         handleActorAnswerRequest(intent, session, callback);
+    } else if ("ScoreIntent" === intentName) {
+        handleScoreRequest(intent, session, callback);
     } else if ("AMAZON.YesIntent" === intentName) {
         handleActorAnswerRequest(intent, session, callback);
     } else if ("AMAZON.NoIntent" === intentName) {
@@ -170,7 +172,7 @@ function getWelcomeResponse(callback) {
         "repromptText": repromptText,
         "currentQuestionIndex": currentQuestionIndex,
         "questions": questions,
-        "score": 0
+        "score": {}
     };
     callback(sessionAttributes,
         buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, shouldEndSession));
@@ -181,7 +183,8 @@ function handleActorAnswerRequest(intent, session, callback) {
     var sessionAttributes = {};
     var gameInProgress = session.attributes && session.attributes.questions;
     var answerSlotValid = true;
-    
+    var playerName = intent.slots.PlayerName.value;
+
     if (!gameInProgress) {
         // If the user responded with an answer but there is no game in progress, ask the user
         // if they want to start a new game. Set a flag to track that we've prompted the user.
@@ -191,9 +194,13 @@ function handleActorAnswerRequest(intent, session, callback) {
             buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
     } else {
         var gameQuestions = session.attributes.questions,
-            currentScore = parseInt(session.attributes.score),
+            currentScore = session.attributes.score,
             currentQuestionIndex = parseInt(session.attributes.currentQuestionIndex),
             possibleCorrectAnswers = questions[session.attributes.currentQuestionIndex].actors
+
+        if (!currentScore[playerName]) {
+            currentScore[playerName] = 0;
+        }
 
         var speechOutputAnalysis = "";
 
@@ -205,7 +212,7 @@ function handleActorAnswerRequest(intent, session, callback) {
             }
         }
         if (inPossibleAnswers) {
-            currentScore++;
+            currentScore[playerName]++;
             speechOutputAnalysis = "correct. ";
         } else {
             speechOutputAnalysis = "wrong. "
@@ -213,8 +220,8 @@ function handleActorAnswerRequest(intent, session, callback) {
         }
         // if currentQuestionIndex is 4, we've reached 5 questions (zero-indexed) and can exit the game session
         if (currentQuestionIndex == GAME_LENGTH - 1) {
-            speechOutput += speechOutputAnalysis + "You got " + currentScore.toString() + " out of "
-                + GAME_LENGTH.toString() + " questions correct. Thank you for playing!";
+            speechOutput += speechOutputAnalysis + " Thank you for playing!";
+            speechOutput += " Final scores: " + getScores(session);
             callback(session.attributes,
                 buildSpeechletResponse(CARD_TITLE, speechOutput, "", true));
         } else {
@@ -223,7 +230,7 @@ function handleActorAnswerRequest(intent, session, callback) {
             var questionIndexForSpeech = currentQuestionIndex + 1,
                 repromptText = "Question " + questionIndexForSpeech.toString() + ". " + spokenQuestion + " ";
 
-            speechOutput += speechOutputAnalysis + "Your score is " + currentScore.toString() + ". " + repromptText;
+            speechOutput += speechOutputAnalysis + playerName + " Your score is " + currentScore[playerName].toString() + ". " + repromptText;
 
             sessionAttributes = {
                 "speechOutput": repromptText,
@@ -236,6 +243,37 @@ function handleActorAnswerRequest(intent, session, callback) {
                 buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
         }
     }
+}
+
+function handleScoreRequest(intent, session, callback) {
+    var score = session.attributes.score;
+    var playerScore = getScores(session);
+
+    var speechOutput = playerScore + " " + session.attributes.speechOutput;
+
+    var sessionAttributes = {
+        "speechOutput": speechOutput,
+        "repromptText": speechOutput,
+        "currentQuestionIndex": session.attributes.currentQuestionIndex,
+        "questions": session.attributes.questions,
+        "score": session.attributes.score
+    };
+    callback(sessionAttributes,
+        buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+}
+
+function getScores(session) {
+    var score = session.attributes.score;
+    var playerScore = "";
+    for (var player in score) {
+        if (score.hasOwnProperty(player)) {
+            playerScore += player + " has " + score[player] + " points ";
+        }
+    }
+    if (!playerScore) {
+        playerScore = "No one has points yet";
+    }
+    return playerScore;
 }
 
 function handleRepeatRequest(intent, session, callback) {

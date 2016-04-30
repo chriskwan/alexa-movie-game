@@ -6,8 +6,15 @@
         {
           "name": "ActorName",
           "type": "LIST_OF_ACTORS"
+        },
+        {
+          "name": "PlayerName",
+          "type": "LIST_OF_PLAYERS"
         }
       ]
+    },
+    {
+      "intent": "ScoreIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"
