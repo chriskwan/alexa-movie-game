@@ -1,0 +1,2 @@
+ActorAnswerIntent The answer is {ActorName}
+ActorAnswerIntent {ActorName}

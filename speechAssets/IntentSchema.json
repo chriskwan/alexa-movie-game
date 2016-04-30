@@ -1,0 +1,16 @@
+{
+  "intents": [
+    {
+      "intent": "ActorAnswerIntent",
+      "slots": [
+        {
+          "name": "ActorName",
+          "type": "LIST_OF_ACTORS"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}
