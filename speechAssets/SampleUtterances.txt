@@ -1,5 +1,9 @@
 ActorAnswerIntent I'm {PlayerName} and the answer is {ActorName}
 ActorAnswerIntent I'm {PlayerName} {ActorName}
+ActorAnswerIntent {ActorName} I'm {PlayerName}
 ScoreIntent What's the score
 ScoreIntent Score please
 ScoreIntent Who's winning
+ScoreIntent Who is winning
+InfoIntent Tell me more about that movie
+InfoIntent What happens in that movie again

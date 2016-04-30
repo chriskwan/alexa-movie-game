@@ -26,7 +26,8 @@ var questions = [
             "Kristen Bell",
             "Idina Menzel",
             "Josh Gad"
-        ]
+        ],
+        info: "When the newly crowned Queen Elsa accidentally uses her power to turn things into ice to curse her home in infinite winter, her sister, Anna, teams up with a mountain man, his playful reindeer, and a snowman to change the weather condition."
     },
     {
         movieName: "Transformers",
@@ -34,7 +35,29 @@ var questions = [
             "Shia LaBeouf",
             "Megan Fox",
             "Hugo Weaving"
-        ]
+        ],
+        info: "An ancient struggle between two Cybertronian races, the heroic Autobots and the evil Decepticons, comes to Earth, with a clue to the ultimate power held by a teenager."
+    },
+    {
+        movieName: "The Avengers",
+        actors: [
+            "Robert Downey Junior",
+            "Chris Evans",
+            "Mark Ruffalo",
+            "Chris Hemsworth",
+            "Scarlett Johansson"
+        ],
+        info: "Earth's mightiest heroes must come together and learn to fight as a team if they are to stop the mischievous Loki and his alien army from enslaving humanity."
+    },
+    {
+        movieName: "The Godfather",
+        actors: [
+            "Marlon Brando",
+            "Al Pacino",
+            "Robert Duvall",
+            "Diane Keaton"
+        ],
+        info: "The early life and career of Vito Corleone in 1920s New York is portrayed while his son, Michael, expands and tightens his grip on his crime syndicate stretching from Lake Tahoe, Nevada to pre-revolution 1958 Cuba."
     }
 ];
 
@@ -123,6 +146,8 @@ function onIntent(intentRequest, session, callback) {
         handleActorAnswerRequest(intent, session, callback);
     } else if ("ScoreIntent" === intentName) {
         handleScoreRequest(intent, session, callback);
+    } else if ("InfoIntent" === intentName) {
+        handleInfoRequest(intent, session, callback);
     } else if ("AMAZON.YesIntent" === intentName) {
         handleActorAnswerRequest(intent, session, callback);
     } else if ("AMAZON.NoIntent" === intentName) {
@@ -243,6 +268,21 @@ function handleActorAnswerRequest(intent, session, callback) {
                 buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
         }
     }
+}
+
+function handleInfoRequest(intent, session, callback) {
+    var info = questions[session.attributes.currentQuestionIndex].info;
+    var speechOutput = "Here is a description of the movie: " + info + session.attributes.speechOutput;
+
+    var sessionAttributes = {
+        "speechOutput": speechOutput,
+        "repromptText": speechOutput,
+        "currentQuestionIndex": session.attributes.currentQuestionIndex,
+        "questions": session.attributes.questions,
+        "score": session.attributes.score
+    };
+    callback(sessionAttributes,
+        buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
 }
 
 function handleScoreRequest(intent, session, callback) {
