@@ -195,6 +195,7 @@ function getWelcomeResponse(callback) {
     sessionAttributes = {
         "speechOutput": repromptText,
         "repromptText": repromptText,
+        "currentQuestionText": repromptText,
         "currentQuestionIndex": currentQuestionIndex,
         "questions": questions,
         "score": {}
@@ -247,6 +248,7 @@ function handleActorAnswerRequest(intent, session, callback) {
         if (currentQuestionIndex == GAME_LENGTH - 1) {
             speechOutput += speechOutputAnalysis + " Thank you for playing!";
             speechOutput += " Final scores: " + getScores(session);
+            
             callback(session.attributes,
                 buildSpeechletResponse(CARD_TITLE, speechOutput, "", true));
         } else {
@@ -260,6 +262,7 @@ function handleActorAnswerRequest(intent, session, callback) {
             sessionAttributes = {
                 "speechOutput": repromptText,
                 "repromptText": repromptText,
+                "currentQuestionText": repromptText,
                 "currentQuestionIndex": currentQuestionIndex,
                 "questions": questions,
                 "score": currentScore
@@ -272,12 +275,13 @@ function handleActorAnswerRequest(intent, session, callback) {
 
 function handleInfoRequest(intent, session, callback) {
     var info = questions[session.attributes.currentQuestionIndex].info;
-    var speechOutput = "Here is a description of the movie: " + info + session.attributes.speechOutput;
+    var speechOutput = "Here is a description of the movie: " + info + session.attributes.currentQuestionText;
 
     var sessionAttributes = {
         "speechOutput": speechOutput,
         "repromptText": speechOutput,
         "currentQuestionIndex": session.attributes.currentQuestionIndex,
+        "currentQuestionText": session.attributes.currentQuestionText,
         "questions": session.attributes.questions,
         "score": session.attributes.score
     };
@@ -289,12 +293,13 @@ function handleScoreRequest(intent, session, callback) {
     var score = session.attributes.score;
     var playerScore = getScores(session);
 
-    var speechOutput = playerScore + " " + session.attributes.speechOutput;
+    var speechOutput = playerScore + " " + session.attributes.currentQuestionText;
 
     var sessionAttributes = {
         "speechOutput": speechOutput,
         "repromptText": speechOutput,
         "currentQuestionIndex": session.attributes.currentQuestionIndex,
+        "currentQuestionText": session.attributes.currentQuestionText,
         "questions": session.attributes.questions,
         "score": session.attributes.score
     };
