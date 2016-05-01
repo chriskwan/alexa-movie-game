@@ -184,8 +184,11 @@ var GAME_LENGTH = questions.length;
 var CARD_TITLE = "Movie Game"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
+
+    var mp3 = "http://www.orangefreesounds.com/wp-content/uploads/2014/10/Jeopardy-theme-song.mp3";
+    
     var sessionAttributes = {},
-        speechOutput = "Movie Game. I will name a movie and you name an actor. Let's begin. ",
+        speechOutput = "<speak> Movie Game. I will name a movie and you name an actor. Let's begin. <audio src='"+mp3+"'/> </speak>",
         shouldEndSession = false,
         currentQuestionIndex = 0,
         spokenQuestion = questions[currentQuestionIndex].movieName,
@@ -248,7 +251,7 @@ function handleActorAnswerRequest(intent, session, callback) {
         if (currentQuestionIndex == GAME_LENGTH - 1) {
             speechOutput += speechOutputAnalysis + " Thank you for playing!";
             speechOutput += " Final scores: " + getScores(session);
-            
+
             callback(session.attributes,
                 buildSpeechletResponse(CARD_TITLE, speechOutput, "", true));
         } else {
@@ -361,8 +364,8 @@ function handleFinishSessionRequest(intent, session, callback) {
 // ------- Helper functions to build responses -------
 
 
-function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
-    return {
+function buildSpeechletResponse(title, output, repromptText, shouldEndSession, isMusic) {
+    var ret = {
         outputSpeech: {
             type: "PlainText",
             text: output
@@ -380,6 +383,13 @@ function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
         },
         shouldEndSession: shouldEndSession
     };
+    if(isMusic) {
+        ret.outputSpeech = {
+            type: "SSML",
+            ssml: output
+        }
+    }
+    return ret;
 }
 
 function buildSpeechletResponseWithoutCard(output, repromptText, shouldEndSession) {
